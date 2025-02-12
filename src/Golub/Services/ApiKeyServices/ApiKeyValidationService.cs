@@ -7,6 +7,11 @@ namespace Golub.Services.ApiKeyServices
         private readonly IApiKeyRepository _apiKeyRepository 
             = apiKeyRepository ?? throw new ArgumentNullException(nameof(apiKeyRepository));
 
+        /// <summary>
+        /// Validates if the API Key is valid and exists in database
+        /// </summary>
+        /// <param name="apiKey"></param>
+        /// <returns></returns>
         public async Task<bool> IsValidApiKeyAsync(string apiKey)
         {
             if (!Guid.TryParse(apiKey, out var apiKeyGuid)) return false;

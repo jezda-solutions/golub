@@ -10,6 +10,7 @@ namespace Golub.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // Checks if API Key header is present
             if (!context.Request.Headers.TryGetValue("X-API-Key", out var value))
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -17,18 +18,28 @@ namespace Golub.Middlewares
                 return;
             }
 
-            var apiKey = value.FirstOrDefault();
+            var encryptedApiKey = value.FirstOrDefault();
 
-            using (var scope = _serviceScopeFactory.CreateScope())
+            using var scope = _serviceScopeFactory.CreateScope();
+            var decryptionService = scope.ServiceProvider.GetRequiredService<ApiKeyService>();
+
+            // Decryption of API Key
+            var apiKey = decryptionService.DecryptApiKey(encryptedApiKey);
+            if (string.IsNullOrEmpty(apiKey))
             {
-                var apiKeyValidationService = scope.ServiceProvider.GetRequiredService<ApiKeyValidationService>();
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("Invalid API Key format.");
+                return;
+            }
 
-                if (string.IsNullOrEmpty(apiKey) || !await apiKeyValidationService.IsValidApiKeyAsync(apiKey))
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    await context.Response.WriteAsync("Invalid or expired API Key.");
-                    return;
-                }
+            var apiKeyValidationService = scope.ServiceProvider.GetRequiredService<ApiKeyValidationService>();
+
+            // Checks if API Key is valid and exist in database
+            if (!await apiKeyValidationService.IsValidApiKeyAsync(apiKey))
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsync("Invalid or expired API Key.");
+                return;
             }
 
             await _next(context);

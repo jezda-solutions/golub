@@ -14,6 +14,8 @@
 
         public string From { get; set; }
 
+        public string FromName { get; set; }
+
         public string InnerHtml { get; set; }
     }
 }

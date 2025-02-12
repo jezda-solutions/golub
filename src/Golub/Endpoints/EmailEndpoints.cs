@@ -7,6 +7,7 @@ namespace Golub.Endpoints
     {
         public static IEndpointRouteBuilder MapEmailEndpoints(this IEndpointRouteBuilder endpoints)
         {
+            // Sending email endpoint
             endpoints.MapPost("/api/emails/send", async (IEmailService emailService, SendEmailRequest request) =>
             {
                 await emailService.SendEmailAsync(request);

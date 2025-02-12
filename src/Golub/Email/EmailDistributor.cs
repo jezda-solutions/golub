@@ -2,7 +2,6 @@
 using Golub.Enums;
 using Golub.Interfaces.Repositories;
 using Golub.Requests;
-using Golub.Responses;
 using Golub.Services.Interfaces;
 
 namespace Golub.Email
@@ -56,6 +55,7 @@ namespace Golub.Email
                         Ccs = request.Ccs,
                         InnerHtml = request.InnerHtml,
                         From = request.From,
+                        FromName = request.FromName,
                         PlainTextContent = request.PlainTextContent
                     }, provider);
 
@@ -74,7 +74,7 @@ namespace Golub.Email
 
                     await UpdateEmailProviderCapacityAsync(provider, batch.Count());
 
-                    // uklanjamo sve emailove koji smo poslali da bi znali koliko ih je ostalo u sledecem krugu da saljemo
+                    // removing all sent emails, so we don't send them again
                     recipients.RemoveRange(0, batch.Count());
 
                     _logger.LogInformation("Successfully sent batch of {Count} emails using {ProviderName}.",
@@ -101,6 +101,11 @@ namespace Golub.Email
             }
         }
 
+        /// <summary>
+        /// Returns email provider with remaining capacity
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private async Task<EmailProvider> GetEmailProviderWithCapacityAsync(string name)
         {
             var provider = await _emailProviderRepository.GetFirstAsync(x => x.Name == name && x.IsActive);
@@ -115,6 +120,12 @@ namespace Golub.Email
             return provider;
         }
 
+        /// <summary>
+        /// Updates email provider capacity
+        /// </summary>
+        /// <param name="emailProvider"></param>
+        /// <param name="numberOfEmails"></param>
+        /// <returns></returns>
         public async Task UpdateEmailProviderCapacityAsync(EmailProvider emailProvider, int numberOfEmails)
         {
             emailProvider.RemainingQty -= numberOfEmails;

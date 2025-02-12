@@ -5,6 +5,8 @@ using Golub.Requests;
 using Golub.Responses;
 using Golub.Responses.ProviderResponse;
 using Golub.Services.Interfaces;
+using Golub.Settings;
+using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Net;
@@ -12,15 +14,47 @@ using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
-    public class SendGridEmailProvider : IEmailProvider
+    public class SendGridEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<SendGridEmailProvider> logger) : IEmailProvider
     {
+        private readonly EmailSettings _emailSettings = emailSettings.Value;
+        private readonly ILogger<SendGridEmailProvider> _logger 
+            = logger ?? throw new ArgumentNullException(nameof(logger));
+
         public string ProviderName => EmailProviderConstants.SendGrid;
 
         public async Task<IResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
         {
             var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
+
+            if (!string.IsNullOrEmpty(request.From))
+            {
+                if (request.From != configuration.FromEmail)
+                {
+                    _logger.LogWarning(
+                        "The 'From' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
+                        "There is a chance that the email might not be sent because the email might not be registered with the provider.",
+                        request.From,
+                        configuration.FromEmail
+                    );
+                }
+            }
+
             var client = new SendGridClient(configuration.ApiKey);
-            var from = new EmailAddress(configuration.FromEmail, configuration.FromName);
+
+            var fromEmail = request.From;
+            var fromName = request.FromName;
+
+            if (string.IsNullOrEmpty(fromEmail))
+            {
+                fromEmail = configuration.FromEmail;
+            }
+
+            if (string.IsNullOrEmpty(fromName))
+            {
+                fromName = configuration.FromName;
+            }
+
+            var from = new EmailAddress(fromEmail, fromName);
 
             var tos = request.Tos
                 .Select(x => new EmailAddress(x))
@@ -37,14 +71,10 @@ namespace Golub.Email.Providers
                 request.InnerHtml,
                 substitutions);
 
-            // Sklonicemo komentar ukoliko nam bude
-            // trebao dokaz da slanje emailova radi
-            //sendGridMessage.AddBccs(
-            //[
-            //    new("zoran.jezdimirovic@live.com")
-            //]);
-
-            await client.SendEmailAsync(sendGridMessage);
+            if (!string.IsNullOrEmpty(_emailSettings.Bcc))
+            {
+                sendGridMessage.AddBccs([new EmailAddress(_emailSettings.Bcc)]);
+            }
 
             try
             {

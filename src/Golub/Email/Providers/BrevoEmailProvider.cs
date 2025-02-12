@@ -1,4 +1,7 @@
-﻿using Golub.Constants;
+﻿using brevo_csharp.Api;
+using brevo_csharp.Client;
+using brevo_csharp.Model;
+using Golub.Constants;
 using Golub.Entities;
 using Golub.Entities.ProviderConfiguration;
 using Golub.Requests;
@@ -6,25 +9,24 @@ using Golub.Responses;
 using Golub.Responses.ProviderResponse;
 using Golub.Services.Interfaces;
 using Golub.Settings;
-using Mandrill;
-using Mandrill.Models;
-using Mandrill.Requests.Messages;
 using Microsoft.Extensions.Options;
+using SendGrid.Helpers.Mail;
 using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
-    public class ManDrillEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<ManDrillEmailProvider> logger) : IEmailProvider
+    public class BrevoEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<BrevoEmailProvider> logger) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly ILogger<ManDrillEmailProvider> _logger 
+        private readonly ILogger<BrevoEmailProvider> _logger 
             = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        public string ProviderName => EmailProviderConstants.ManDrill;
+        public string ProviderName => EmailProviderConstants.Brevo;
 
         public async Task<IResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
         {
             var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
+            Configuration.Default.AddApiKey("api-key", configuration.ApiKey);
 
             if (!string.IsNullOrEmpty(request.From))
             {
@@ -39,14 +41,7 @@ namespace Golub.Email.Providers
                 }
             }
 
-            var client = new MandrillApi(configuration.ApiKey);
-
-            var tos = new List<EmailAddress>();
-
-            foreach (var email in request.Tos)
-            {
-                tos.Add(new EmailAddress(email));
-            }
+            var apiInstance = new TransactionalEmailsApi();
 
             var fromEmail = request.From;
             var fromName = request.FromName;
@@ -61,46 +56,41 @@ namespace Golub.Email.Providers
                 fromName = configuration.FromName;
             }
 
-            var emailMessage = new EmailMessage()
+            var sender = new SendSmtpEmailSender(fromName, fromEmail);
+
+            var tos = request.Tos
+               .Select(x => new SendSmtpEmailTo(x, x))
+               .ToList();
+
+            var sendSmtpEmail = new SendSmtpEmail
             {
+                Sender = sender,
                 To = tos,
-                FromEmail = fromEmail,
-                FromName = fromName,
                 Subject = request.Subject,
-                Text = request.PlainTextContent
+                HtmlContent = request.InnerHtml,
+                TextContent = request.PlainTextContent
             };
 
             if (!string.IsNullOrEmpty(_emailSettings.Bcc))
             {
-                emailMessage.BccAddress = _emailSettings.Bcc;
+                sendSmtpEmail.Bcc = [new(_emailSettings.Bcc)];
             }
 
-            var emailRequest = new SendMessageRequest(emailMessage);
 
             try
             {
-                var response = await client.SendMessage(emailRequest);
+                CreateSmtpEmail result = await apiInstance.SendTransacEmailAsync(sendSmtpEmail);
 
-                var manDrillResponse = new ManDrillResponse(true, "Email sent successfully");
-
-                foreach (var result in response)
+                if (result.MessageId != null)
                 {
-                    if (result.Status != EmailResultStatus.Sent)
-                    {
-                        manDrillResponse.Success = false;
-                    }
+                    return new BrevoResponse(true, "Email sent successfully.");
                 }
 
-                if (!manDrillResponse.Success)
-                {
-                    manDrillResponse.Message = "Some emails failed to send.";
-                }
-
-                return manDrillResponse;
+                return new BrevoResponse(false, "Failed to send email.");
             }
             catch (Exception ex)
             {
-                return new ManDrillResponse(false, $"Error sending email: {ex.Message}");
+                return new BrevoResponse(false, $"Error sending email: {ex.Message}");
             }
         }
     }

@@ -6,11 +6,10 @@ using Golub.Endpoints;
 using Golub.Interfaces.Repositories;
 using Golub.Middlewares;
 using Golub.Repositories;
-using Golub.Responses;
-using Golub.Responses.ProviderResponse;
 using Golub.Services.ApiKeyServices;
 using Golub.Services.Interfaces;
 using Golub.Services.SeedServices;
+using Golub.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -39,12 +38,15 @@ builder.Services.AddScoped<ISentEmailRepository, SentEmailRepository>();
 builder.Services.AddScoped<IEmailSeedService, EmailSeedService>();
 builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 builder.Services.AddScoped<ApiKeyValidationService>();
+builder.Services.AddScoped<ApiKeyService>();
 builder.Services.AddScoped<IEmailProvider, ManDrillEmailProvider>();
 builder.Services.AddScoped<IEmailProvider, SendGridEmailProvider>();
+builder.Services.AddScoped<IEmailProvider, BrevoEmailProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailDistributor, EmailDistributor>();
-
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection("Security"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
