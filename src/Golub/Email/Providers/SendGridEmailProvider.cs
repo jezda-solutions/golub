@@ -17,42 +17,29 @@ namespace Golub.Email.Providers
     public class SendGridEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<SendGridEmailProvider> logger) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly ILogger<SendGridEmailProvider> _logger 
+        private readonly ILogger<SendGridEmailProvider> _logger
             = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public string ProviderName => EmailProviderConstants.SendGrid;
 
-        public async Task<IResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
+        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
         {
             var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
 
-            if (!string.IsNullOrEmpty(request.From))
+            if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)
             {
-                if (request.From != configuration.FromEmail)
-                {
-                    _logger.LogWarning(
-                        "The 'From' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
-                        "There is a chance that the email might not be sent because the email might not be registered with the provider.",
-                        request.From,
-                        configuration.FromEmail
-                    );
-                }
+                _logger.LogWarning(
+                    "The 'From' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
+                    "There is a chance that the email might not be sent because the email might not be registered with the provider.",
+                    request.From,
+                    configuration.FromEmail
+                );
             }
 
             var client = new SendGridClient(configuration.ApiKey);
 
-            var fromEmail = request.From;
-            var fromName = request.FromName;
-
-            if (string.IsNullOrEmpty(fromEmail))
-            {
-                fromEmail = configuration.FromEmail;
-            }
-
-            if (string.IsNullOrEmpty(fromName))
-            {
-                fromName = configuration.FromName;
-            }
+            var fromEmail = request.From ?? configuration.FromEmail;
+            var fromName = request.FromName ?? configuration.FromName;
 
             var from = new EmailAddress(fromEmail, fromName);
 
@@ -70,6 +57,15 @@ namespace Golub.Email.Providers
                 request.PlainTextContent,
                 request.InnerHtml,
                 substitutions);
+
+            if (request.Bcc != null && request.Bcc.Any())
+            {
+                var bccs = request.Bcc
+                .Select(x => new EmailAddress(x))
+                .ToList();
+
+                sendGridMessage.AddBccs(bccs);
+            }
 
             if (!string.IsNullOrEmpty(_emailSettings.Bcc))
             {

@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -26,6 +25,14 @@
 
   <ItemGroup>
     <Folder Include="Common\Interfaces\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Git\golub\src\Golub\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Git\golub\src\Golub\.editorconfig" />
   </ItemGroup>
 
 </Project>

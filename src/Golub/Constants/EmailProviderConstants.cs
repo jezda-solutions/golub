@@ -4,6 +4,6 @@
     {
         public const string SendGrid = "Sendgrid";
         public const string Brevo = "Brevo";
-        public const string ManDrill = "Mandrill";
+        public const string Mandrill = "Mandrill";
     }
 }

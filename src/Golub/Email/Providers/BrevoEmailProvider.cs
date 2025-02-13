@@ -10,7 +10,6 @@ using Golub.Responses.ProviderResponse;
 using Golub.Services.Interfaces;
 using Golub.Settings;
 using Microsoft.Extensions.Options;
-using SendGrid.Helpers.Mail;
 using System.Text.Json;
 
 namespace Golub.Email.Providers
@@ -18,43 +17,30 @@ namespace Golub.Email.Providers
     public class BrevoEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<BrevoEmailProvider> logger) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly ILogger<BrevoEmailProvider> _logger 
+        private readonly ILogger<BrevoEmailProvider> _logger
             = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public string ProviderName => EmailProviderConstants.Brevo;
 
-        public async Task<IResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
+        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
         {
             var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
             Configuration.Default.AddApiKey("api-key", configuration.ApiKey);
 
-            if (!string.IsNullOrEmpty(request.From))
+            if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)
             {
-                if (request.From != configuration.FromEmail)
-                {
-                    _logger.LogWarning(
-                        "The 'FromEmail' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
-                        "There is a chance that the email might not be sent because the email might not be registered with the provider.",
-                        request.From,
-                        configuration.FromEmail
-                    );
-                }
+                _logger.LogWarning(
+                    "The 'FromEmail' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
+                    "There is a chance that the email might not be sent because the email might not be registered with the provider.",
+                    request.From,
+                    configuration.FromEmail
+                );
             }
 
             var apiInstance = new TransactionalEmailsApi();
 
-            var fromEmail = request.From;
-            var fromName = request.FromName;
-
-            if (string.IsNullOrEmpty(fromEmail))
-            {
-                fromEmail = configuration.FromEmail;
-            }
-
-            if (string.IsNullOrEmpty(fromName))
-            {
-                fromName = configuration.FromName;
-            }
+            var fromEmail = request.From ?? configuration.FromEmail;
+            var fromName = request.FromName ?? configuration.FromName;
 
             var sender = new SendSmtpEmailSender(fromName, fromEmail);
 
@@ -73,9 +59,18 @@ namespace Golub.Email.Providers
 
             if (!string.IsNullOrEmpty(_emailSettings.Bcc))
             {
-                sendSmtpEmail.Bcc = [new(_emailSettings.Bcc)];
+                sendSmtpEmail.Bcc =
+                [
+                    new(_emailSettings.Bcc)
+                ];
             }
 
+            if (request.Bcc != null && request.Bcc.Any())
+            {
+                var bccs = request.Bcc.Select(x => new SendSmtpEmailBcc(x, x));
+
+                sendSmtpEmail.Bcc.AddRange(bccs);
+            }
 
             try
             {

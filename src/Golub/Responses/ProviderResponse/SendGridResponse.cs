@@ -1,8 +1,7 @@
 ﻿namespace Golub.Responses.ProviderResponse
 {
-    public class SendGridResponse(bool success, string message) : IResponse
+    public record SendGridResponse : EmailResponse<object>
     {
-        public bool Success { get; set; } = success;
-        public string Message { get; set; } = message;
+        public SendGridResponse(bool success, string message) : base(success, message) { }
     }
 }

@@ -14,29 +14,26 @@ using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
-    public class ManDrillEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<ManDrillEmailProvider> logger) : IEmailProvider
+    public class MandrillEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<MandrillEmailProvider> logger) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly ILogger<ManDrillEmailProvider> _logger 
+        private readonly ILogger<MandrillEmailProvider> _logger
             = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        public string ProviderName => EmailProviderConstants.ManDrill;
+        public string ProviderName => EmailProviderConstants.Mandrill;
 
-        public async Task<IResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
+        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
         {
             var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
 
-            if (!string.IsNullOrEmpty(request.From))
+            if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)
             {
-                if (request.From != configuration.FromEmail)
-                {
-                    _logger.LogWarning(
+                _logger.LogWarning(
                         "The 'FromEmail' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
                         "There is a chance that the email might not be sent because the email might not be registered with the provider.",
                         request.From,
                         configuration.FromEmail
-                    );
-                }
+                );
             }
 
             var client = new MandrillApi(configuration.ApiKey);
@@ -48,18 +45,8 @@ namespace Golub.Email.Providers
                 tos.Add(new EmailAddress(email));
             }
 
-            var fromEmail = request.From;
-            var fromName = request.FromName;
-
-            if (string.IsNullOrEmpty(fromEmail))
-            {
-                fromEmail = configuration.FromEmail;
-            }
-
-            if (string.IsNullOrEmpty(fromName))
-            {
-                fromName = configuration.FromName;
-            }
+            var fromEmail = request.From ?? configuration.FromEmail;
+            var fromName = request.FromName ?? configuration.FromName;
 
             var emailMessage = new EmailMessage()
             {
@@ -79,28 +66,35 @@ namespace Golub.Email.Providers
 
             try
             {
-                var response = await client.SendMessage(emailRequest);
+                var responses = await client.SendMessage(emailRequest);
 
-                var manDrillResponse = new ManDrillResponse(true, "Email sent successfully");
+                var mandrillResponse = new MandrillResponse(true, "Email sent successfully", []);
 
-                foreach (var result in response)
+                foreach (var response in responses)
                 {
-                    if (result.Status != EmailResultStatus.Sent)
+                    if (response.Status != EmailResultStatus.Sent)
                     {
-                        manDrillResponse.Success = false;
+                        mandrillResponse = mandrillResponse with
+                        {
+                            Data =
+                            [
+                                .. mandrillResponse.Data,
+                                new FailedEmailResponse
+                                    {
+                                        Status = response.Status,
+                                        Email = response.Email,
+                                        RejectReason = response.RejectReason
+                                    },
+                            ]
+                        };
                     }
                 }
 
-                if (!manDrillResponse.Success)
-                {
-                    manDrillResponse.Message = "Some emails failed to send.";
-                }
-
-                return manDrillResponse;
+                return mandrillResponse;
             }
             catch (Exception ex)
             {
-                return new ManDrillResponse(false, $"Error sending email: {ex.Message}");
+                return new MandrillResponse(false, $"Error sending email: {ex.Message}", []);
             }
         }
     }

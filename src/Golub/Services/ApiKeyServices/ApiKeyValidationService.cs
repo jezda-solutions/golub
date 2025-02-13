@@ -16,8 +16,8 @@ namespace Golub.Services.ApiKeyServices
         {
             if (!Guid.TryParse(apiKey, out var apiKeyGuid)) return false;
 
-            var apiKeyEntity = await _apiKeyRepository.GetApiKeyAsync(apiKeyGuid);
-            return apiKeyEntity != null;
+            return await _apiKeyRepository.AnyAsync(a => a.ApiKeyValue == apiKeyGuid
+                                                         && (a.ExpirationDate == null || a.ExpirationDate > DateTimeOffset.UtcNow));
         }
     }
 }

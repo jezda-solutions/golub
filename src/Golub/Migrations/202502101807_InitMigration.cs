@@ -2,7 +2,7 @@
 
 namespace Golub.Migrations
 {
-    [Migration(100220251807)]
+    [Migration(202502101807)]
     public class InitMigration : Migration
     {
         public override void Up()
@@ -20,8 +20,8 @@ namespace Golub.Migrations
         private void InitTables()
         {
             Create.Table("ApiKeys")
-                .WithColumn("Id").AsGuid().PrimaryKey().WithDefaultValue(Guid.NewGuid())
-                .WithColumn("ApiKeyValue").AsGuid().NotNullable().Unique()
+                .WithColumn("Id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
+                .WithColumn("ApiKeyValue").AsGuid().NotNullable().Unique().WithDefaultValue(Guid.CreateVersion7())
                 .WithColumn("ExpirationDate").AsDateTimeOffset().Nullable()
                 .WithColumn("ApplicationName").AsString().Nullable()
                 .WithColumn("CreatedOnUtc").AsDateTimeOffset().NotNullable()

@@ -2,7 +2,7 @@
 
 namespace Golub.Responses
 {
-    public interface IResponse
+    public interface IEmailResponse
     {
         bool Success { get; }
         string Message { get; }

@@ -16,6 +16,6 @@ namespace Golub.Services.Interfaces
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<IResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider);
+        Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider);
     }
 }

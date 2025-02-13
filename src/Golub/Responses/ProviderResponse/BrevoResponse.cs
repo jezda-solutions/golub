@@ -1,8 +1,7 @@
 ﻿namespace Golub.Responses.ProviderResponse
 {
-    public class BrevoResponse(bool success, string message) : IResponse
+    public record BrevoResponse : EmailResponse<object>
     {
-        public bool Success { get; set; } = success;
-        public string Message { get; set; } = message;
+        public BrevoResponse(bool success, string message) : base(success, message) { }
     }
 }

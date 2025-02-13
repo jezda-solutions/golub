@@ -9,12 +9,14 @@ namespace Golub.Services.SeedServices
 {
     public class EmailSeedService(IEmailProviderRepository emailProviderRepository) : IEmailSeedService
     {
-        private readonly IEmailProviderRepository _emailProviderRepository 
+        private readonly IEmailProviderRepository _emailProviderRepository
             = emailProviderRepository ?? throw new ArgumentNullException(nameof(emailProviderRepository));
 
         public async Task SeedAsync()
         {
             if (await _emailProviderRepository.AnyAsync()) return;
+
+            if (!Directory.Exists(SeedConstants.EmailProvidersConfigurationPath)) return;
 
             var fileNames = Directory.GetFiles(SeedConstants.EmailProvidersConfigurationPath);
 

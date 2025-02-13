@@ -29,29 +29,33 @@ namespace Golub.Email
             {
                 if (!Enum.TryParse(emailProvider.ProviderName, out EmailProviderType emailProviderType))
                 {
-                    throw new Exception($"Za ovog providera '{emailProvider.ProviderName}' nemamo definisan odgovarajući EmailProviderType.");
+                    _logger.LogError("Email provider '{ProviderName}' not found.", emailProvider.ProviderName);
+                    continue;
                 }
 
-                var provider
-                    = await GetEmailProviderWithCapacityAsync(emailProvider.ProviderName)
-                      ?? throw new ArgumentNullException(nameof(emailProvider));
+                var provider = await GetEmailProviderWithCapacityAsync(emailProvider.ProviderName);
+
+                if (provider == null)
+                {
+                    _logger.LogError("Email provider '{ProviderName}' not found.", emailProvider.ProviderName);
+                    continue;
+                }
 
                 var remainingCapacity
                     = provider.RemainingQty;
 
                 if (remainingCapacity == null || remainingCapacity == 0) continue;
 
-                var batch
-                    = recipients.Take(remainingCapacity.Value);
+                var emailsToSend = recipients.Take(remainingCapacity.Value);
 
-                if (!batch.Any()) continue;
+                if (!emailsToSend.Any()) continue;
 
                 try
                 {
                     var response = await emailProvider.SendEmailAsync(new SendEmailRequest
                     {
                         Subject = request.Subject,
-                        Tos = batch,
+                        Tos = emailsToSend,
                         Ccs = request.Ccs,
                         InnerHtml = request.InnerHtml,
                         From = request.From,
@@ -59,7 +63,7 @@ namespace Golub.Email
                         PlainTextContent = request.PlainTextContent
                     }, provider);
 
-                    foreach (var email in batch)
+                    foreach (var email in emailsToSend)
                     {
                         sentEmails.Add(new SentEmail
                         {
@@ -72,13 +76,13 @@ namespace Golub.Email
                         });
                     }
 
-                    await UpdateEmailProviderCapacityAsync(provider, batch.Count());
+                    await UpdateEmailProviderCapacityAsync(provider, emailsToSend.Count());
 
                     // removing all sent emails, so we don't send them again
-                    recipients.RemoveRange(0, batch.Count());
+                    recipients.RemoveRange(0, emailsToSend.Count());
 
                     _logger.LogInformation("Successfully sent batch of {Count} emails using {ProviderName}.",
-                                           batch.Count(),
+                                           emailsToSend.Count(),
                                            emailProvider.GetType().Name);
                 }
                 catch (Exception ex)
@@ -89,7 +93,7 @@ namespace Golub.Email
                 if (recipients.Count == 0) break;
             }
 
-            if(sentEmails.Count > 0)
+            if (sentEmails.Count > 0)
             {
                 await _sentEmailRepository.AddRangeAsync(sentEmails);
             }
@@ -131,7 +135,7 @@ namespace Golub.Email
             emailProvider.RemainingQty -= numberOfEmails;
             emailProvider.LastUsedOn = DateTimeOffset.UtcNow;
 
-            _ = await _emailProviderRepository.UpdateAsync(emailProvider);
+            await _emailProviderRepository.UpdateAsync(emailProvider);
         }
     }
 }

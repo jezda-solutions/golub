@@ -27,7 +27,7 @@ builder.Host.UseSerilog();
 
 builder.Services.AddLogging();
 
-// Registrovanje servisa
+// Register services
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -39,7 +39,7 @@ builder.Services.AddScoped<IEmailSeedService, EmailSeedService>();
 builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 builder.Services.AddScoped<ApiKeyValidationService>();
 builder.Services.AddScoped<ApiKeyService>();
-builder.Services.AddScoped<IEmailProvider, ManDrillEmailProvider>();
+builder.Services.AddScoped<IEmailProvider, MandrillEmailProvider>();
 builder.Services.AddScoped<IEmailProvider, SendGridEmailProvider>();
 builder.Services.AddScoped<IEmailProvider, BrevoEmailProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -53,7 +53,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Golub API",
         Version = "v1",
-        Description = "API za slanje emailova"
+        Description = "API for sending emails"
     });
 
     options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
@@ -61,7 +61,7 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Name = "X-API-Key",
         Type = SecuritySchemeType.ApiKey,
-        Description = "Unesite API ključ za autentifikaciju"
+        Description = "Enter API Key for authentication"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -84,16 +84,17 @@ var app = builder.Build();
 
 app.Services.ApplyMigrations();
 
-// Seedovanje podataka
+// Seed email providers
 using (var scope = app.Services.CreateScope())
 {
     var emailSeedService = scope.ServiceProvider.GetRequiredService<IEmailSeedService>();
     await emailSeedService.SeedAsync();
 }
 
-// Registracija email endpointa
+// Register endpoints
 app.MapEmailEndpoints();
 
+// Middleware checks the API Key only when the request starts with /api/emails
 app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/emails"), appBuilder =>
 {
     appBuilder.UseMiddleware<ApiKeyMiddleware>();
