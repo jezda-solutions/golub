@@ -5,38 +5,38 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Golub.Configurations
 {
-    internal class SentEmailConfiguration : IEntityTypeConfiguration<SentEmail>
+    internal class SentEmailConfiguration : IEntityTypeConfiguration<sent_email>
     {
-        public void Configure(EntityTypeBuilder<SentEmail> builder)
+        public void Configure(EntityTypeBuilder<sent_email> builder)
         {
-            builder.ToTable(nameof(AppDbContext.SentEmails));
+            builder.ToTable("sent_email");
 
-            builder.HasKey(e => e.Id);
+            builder.HasKey(e => e.id);
 
-            builder.Property(e => e.From)
+            builder.Property(e => e.from)
                 .IsRequired();
 
-            builder.Property(e => e.To)
+            builder.Property(e => e.to)
                 .IsRequired();
 
-            builder.Property(e => e.Subject)
+            builder.Property(e => e.subject)
                 .IsRequired();
 
-            builder.Property(e => e.IsSuccesful)
+            builder.Property(e => e.is_successful)
                 .IsRequired();
 
-            builder.Property(e => e.Remark)
+            builder.Property(e => e.remark)
                 .IsRequired();
 
-            builder.Property(e => e.CreatedOnUtc)
+            builder.Property(e => e.created_on_utc)
                 .IsRequired();
 
-            builder.Property(e => e.ModifiedOnUtc)
+            builder.Property(e => e.modified_on_utc)
                 .IsRequired(false);
 
-            builder.HasOne(e => e.EmailProvider)
+            builder.HasOne(e => e.email_provider)
                 .WithMany()
-                .HasForeignKey(e => e.EmailProviderId);
+                .HasForeignKey(e => e.email_provider_id);
         }
     }
 }

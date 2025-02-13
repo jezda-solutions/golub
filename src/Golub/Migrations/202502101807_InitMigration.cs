@@ -22,55 +22,55 @@ namespace Golub.Migrations
 
         private void InitTables()
         {
-            Create.Table("ApiKeys")
-                .WithColumn("Id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
-                .WithColumn("ApiKeyValue").AsGuid().NotNullable().Unique().WithDefaultValue(Guid.CreateVersion7())
-                .WithColumn("ExpirationDate").AsDateTimeOffset().Nullable()
-                .WithColumn("ApplicationName").AsString().Nullable()
-                .WithColumn("CreatedOnUtc").AsDateTimeOffset().NotNullable()
-                .WithColumn("ModifiedOnUtc").AsDateTimeOffset().Nullable();
+            Create.Table("api_key")
+                .WithColumn("id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
+                .WithColumn("api_key_value").AsGuid().NotNullable().Unique().WithDefaultValue(Guid.CreateVersion7())
+                .WithColumn("expiration_date").AsDateTimeOffset().Nullable()
+                .WithColumn("application_name").AsString().Nullable()
+                .WithColumn("created_on_utc").AsDateTimeOffset().NotNullable()
+                .WithColumn("modified_on_utc").AsDateTimeOffset().Nullable();
 
-            Create.Table("EmailProviders")
-                .WithColumn("Id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
-                .WithColumn("Name").AsString().NotNullable()
-                .WithColumn("IsActive").AsBoolean().NotNullable()
-                .WithColumn("Configuration").AsString().Nullable()
-                .WithColumn("LastUsedOn").AsDateTimeOffset().NotNullable()
-                .WithColumn("FreePlanQty").AsInt32().Nullable()
-                .WithColumn("RemainingQty").AsInt32().Nullable()
-                .WithColumn("Period").AsInt32().Nullable()
-                .WithColumn("CreatedOnUtc").AsDateTimeOffset().NotNullable()
-                .WithColumn("ModifiedOnUtc").AsDateTimeOffset().Nullable();
+            Create.Table("email_provider")
+                .WithColumn("id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
+                .WithColumn("name").AsString().NotNullable()
+                .WithColumn("is_active").AsBoolean().NotNullable()
+                .WithColumn("configuration").AsString().Nullable()
+                .WithColumn("last_used_on").AsDateTimeOffset().NotNullable()
+                .WithColumn("free_plan_qty").AsInt32().Nullable()
+                .WithColumn("remaining_qty").AsInt32().Nullable()
+                .WithColumn("period").AsInt32().Nullable()
+                .WithColumn("created_on_utc").AsDateTimeOffset().NotNullable()
+                .WithColumn("modified_on_utc").AsDateTimeOffset().Nullable();
 
-            Create.Table("SentEmails")
-                .WithColumn("Id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
-                .WithColumn("EmailProviderId").AsGuid().NotNullable()
-                .WithColumn("From").AsString().NotNullable()
-                .WithColumn("To").AsString().NotNullable()
-                .WithColumn("Subject").AsString().NotNullable()
-                .WithColumn("IsSuccesful").AsBoolean().NotNullable()
-                .WithColumn("Remark").AsString().NotNullable()
-                .WithColumn("CreatedOnUtc").AsDateTimeOffset().NotNullable()
-                .WithColumn("ModifiedOnUtc").AsDateTimeOffset().Nullable();
+            Create.Table("sent_email")
+                .WithColumn("id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
+                .WithColumn("email_provider_id").AsGuid().NotNullable()
+                .WithColumn("from").AsString().NotNullable()
+                .WithColumn("to").AsString().NotNullable()
+                .WithColumn("subject").AsString().NotNullable()
+                .WithColumn("is_successful").AsBoolean().NotNullable()
+                .WithColumn("remark").AsString().NotNullable()
+                .WithColumn("created_on_utc").AsDateTimeOffset().NotNullable()
+                .WithColumn("modified_on_utc").AsDateTimeOffset().Nullable();
         }
 
         private void InitForeignKeys()
         {
-            Create.ForeignKey("FK_SentEmails_EmailProviders")
-                .FromTable("SentEmails").ForeignColumn("EmailProviderId")
-                .ToTable("EmailProviders").PrimaryColumn("Id");
+            Create.ForeignKey("FK_sent_email_email_provider")
+                .FromTable("sent_email").ForeignColumn("email_provider_id")
+                .ToTable("email_provider").PrimaryColumn("id");
         }
 
         private void DeleteTables()
         {
-            Delete.Table("ApiKeys");
-            Delete.Table("EmailProviders");
-            Delete.Table("SentEmails");
+            Delete.Table("api_key");
+            Delete.Table("email_provider");
+            Delete.Table("sent_email");
         }
 
         private void DeleteForeignKeys()
         {
-            Delete.ForeignKey("FK_SentEmails_EmailProviders").OnTable("SentEmails");
+            Delete.ForeignKey("FK_sent_email_email_provider").OnTable("sent_email");
         }
     }
 }

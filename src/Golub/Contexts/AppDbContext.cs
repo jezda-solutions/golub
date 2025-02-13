@@ -10,9 +10,9 @@ namespace Golub.Contexts
     /// <param name="options"></param>
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
-        public DbSet<EmailProvider> EmailProviders { get; set; } = null!;
-        public DbSet<SentEmail> SentEmails { get; set; } = null!;
-        public DbSet<ApiKey> ApiKeys { get; set; } = null!;
+        public DbSet<email_provider> EmailProviders { get; set; } = null!;
+        public DbSet<sent_email> SentEmails { get; set; } = null!;
+        public DbSet<api_key> ApiKeys { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

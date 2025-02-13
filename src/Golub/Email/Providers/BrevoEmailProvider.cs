@@ -28,9 +28,9 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.Brevo;
 
-        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
+        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, email_provider provider)
         {
-            var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
+            var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.configuration);
             Configuration.Default.AddApiKey("api-key", configuration.ApiKey);
 
             if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)

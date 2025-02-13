@@ -5,7 +5,7 @@ using Golub.Interfaces.Repositories;
 namespace Golub.Repositories
 {
     public class EmailProviderRepository(AppDbContext dbContext)
-        : GenericRepository<EmailProvider>(dbContext), IEmailProviderRepository
+        : GenericRepository<email_provider>(dbContext), IEmailProviderRepository
     {
     }
 }
