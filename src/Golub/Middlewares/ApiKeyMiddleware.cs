@@ -1,11 +1,16 @@
 ﻿using Golub.Services.ApiKeyServices;
 namespace Golub.Middlewares
 {
+    /// <summary>
+    /// Middleware responsible to check the validity of API Key.
+    /// </summary>
+    /// <param name="next"></param>
+    /// <param name="serviceScopeFactory"></param>
     public class ApiKeyMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory)
     {
-        private readonly RequestDelegate _next 
+        private readonly RequestDelegate _next
             = next ?? throw new ArgumentNullException(nameof(next));
-        private readonly IServiceScopeFactory _serviceScopeFactory 
+        private readonly IServiceScopeFactory _serviceScopeFactory
             = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
         public async Task InvokeAsync(HttpContext context)

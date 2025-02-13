@@ -2,6 +2,11 @@
 
 namespace Golub.Data
 {
+    /// <summary>
+    /// Extensions for FluentMigrator
+    /// Adds FluentMigrator to the service collection
+    /// Applies migrations
+    /// </summary>
     public static class MigrationExtensions
     {
         public static IServiceCollection AddMigrations(this IServiceCollection services, string connectionString)

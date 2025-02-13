@@ -2,9 +2,14 @@
 
 namespace Golub.Services.ApiKeyServices
 {
+    /// <summary>
+    /// Service for validating API Key
+    /// Responsible for checking the validity of the API key
+    /// </summary>
+    /// <param name="apiKeyRepository"></param>
     public class ApiKeyValidationService(IApiKeyRepository apiKeyRepository)
     {
-        private readonly IApiKeyRepository _apiKeyRepository 
+        private readonly IApiKeyRepository _apiKeyRepository
             = apiKeyRepository ?? throw new ArgumentNullException(nameof(apiKeyRepository));
 
         /// <summary>

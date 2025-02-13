@@ -1,11 +1,15 @@
-﻿using EllipticCurve;
-using Golub.Settings;
+﻿using Golub.Settings;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Golub.Services.ApiKeyServices
 {
+    /// <summary>
+    /// API key service
+    /// Responsible for decrypting and returning the API key
+    /// </summary>
+    /// <param name="securityOptions"></param>
     public class ApiKeyService(IOptions<SecuritySettings> securityOptions)
     {
         private readonly SecuritySettings _securitySettings = securityOptions.Value;

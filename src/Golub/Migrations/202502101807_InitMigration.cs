@@ -2,6 +2,9 @@
 
 namespace Golub.Migrations
 {
+    /// <summary>
+    /// Initial migration for database
+    /// </summary>
     [Migration(202502101807)]
     public class InitMigration : Migration
     {

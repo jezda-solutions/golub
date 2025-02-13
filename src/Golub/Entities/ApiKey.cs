@@ -1,6 +1,10 @@
 ﻿
 namespace Golub.Entities
 {
+    /// <summary>
+    /// Represents an API key with additional information 
+    /// about the key and holder of the key in the system
+    /// </summary>
     public class ApiKey
     {
         public Guid Id { get; set; }

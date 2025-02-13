@@ -14,6 +14,12 @@ using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
+    /// <summary>
+    /// Brevo Email Provider
+    /// Sends emails using Brevo API
+    /// </summary>
+    /// <param name="emailSettings"></param>
+    /// <param name="logger"></param>
     public class BrevoEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<BrevoEmailProvider> logger) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;

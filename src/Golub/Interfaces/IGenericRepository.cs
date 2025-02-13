@@ -1,7 +1,12 @@
 ﻿using System.Linq.Expressions;
 
-namespace Golub.Repositories
+namespace Golub.Interfaces
 {
+    /// <summary>
+    /// Generic repository interface
+    /// Constains all default methods that one can expect from a repository
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IGenericRepository<T> where T : class
     {
         Task<T> GetById(int id);

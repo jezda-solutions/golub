@@ -7,6 +7,11 @@ using System.Text.Json;
 
 namespace Golub.Services.SeedServices
 {
+    /// <summary>
+    /// Seed EmailProviders
+    /// Service responsible for seeding EmailProviders from json files
+    /// </summary>
+    /// <param name="emailProviderRepository"></param>
     public class EmailSeedService(IEmailProviderRepository emailProviderRepository) : IEmailSeedService
     {
         private readonly IEmailProviderRepository _emailProviderRepository

@@ -3,6 +3,10 @@ using Golub.Services.Interfaces;
 
 namespace Golub.Endpoints
 {
+    /// <summary>
+    /// Email endpoints
+    /// Class contains all email endpoints
+    /// </summary>
     public static class EmailEndpoints
     {
         public static IEndpointRouteBuilder MapEmailEndpoints(this IEndpointRouteBuilder endpoints)

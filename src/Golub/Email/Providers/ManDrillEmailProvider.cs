@@ -14,6 +14,12 @@ using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
+    /// <summary>
+    /// Mandrill email provider
+    /// Sends emails using Mandrill API
+    /// </summary>
+    /// <param name="emailSettings"></param>
+    /// <param name="logger"></param>
     public class MandrillEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<MandrillEmailProvider> logger) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;

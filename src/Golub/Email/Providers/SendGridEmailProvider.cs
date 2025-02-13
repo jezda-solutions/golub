@@ -14,6 +14,12 @@ using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
+    /// <summary>
+    /// SendGrid Email Provider
+    /// Sends emails using the SendGrid API
+    /// </summary>
+    /// <param name="emailSettings"></param>
+    /// <param name="logger"></param>
     public class SendGridEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<SendGridEmailProvider> logger) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;

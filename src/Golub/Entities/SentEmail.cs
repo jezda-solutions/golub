@@ -1,5 +1,9 @@
 ﻿namespace Golub.Entities
 {
+    /// <summary>
+    /// Represents a sent email in the system
+    /// Catches all emails that tried to be sent and writes them to the database
+    /// </summary>
     public class SentEmail
     {
         public Guid Id { get; set; }

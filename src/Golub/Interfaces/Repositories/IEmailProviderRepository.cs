@@ -1,7 +1,9 @@
 ﻿using Golub.Entities;
-using Golub.Repositories;
 
 namespace Golub.Interfaces.Repositories
 {
+    /// <summary>
+    /// Repository for <see cref="EmailProvider"/>
+    /// </summary>
     public interface IEmailProviderRepository : IGenericRepository<EmailProvider> { }
 }
