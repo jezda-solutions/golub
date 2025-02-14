@@ -3,7 +3,7 @@
 namespace Golub.Interfaces.Repositories
 {
     /// <summary>
-    /// Repository for <see cref="email_provider"/>
+    /// Repository for <see cref="EmailProvider"/>
     /// </summary>
-    public interface IEmailProviderRepository : IGenericRepository<email_provider> { }
+    public interface IEmailProviderRepository : IGenericRepository<EmailProvider> { }
 }

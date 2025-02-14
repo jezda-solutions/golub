@@ -3,9 +3,9 @@
 namespace Golub.Interfaces.Repositories
 {
     /// <summary>
-    /// Represents a repository for <see cref="api_key"/>
+    /// Represents a repository for <see cref="ApiKey"/>
     /// </summary>
-    public interface IApiKeyRepository : IGenericRepository<api_key>
+    public interface IApiKeyRepository : IGenericRepository<ApiKey>
     {
     }
 }

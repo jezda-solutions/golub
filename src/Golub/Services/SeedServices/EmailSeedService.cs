@@ -27,7 +27,7 @@ namespace Golub.Services.SeedServices
 
             var emailProviders = await _emailProviderRepository.GetAsync();
 
-            var cb = new ConcurrentBag<email_provider>();
+            var cb = new ConcurrentBag<EmailProvider>();
 
             var tasks = fileNames.Select(async fileName =>
             {
@@ -35,9 +35,9 @@ namespace Golub.Services.SeedServices
 
                 var emailProvidersConfigString = await r.ReadToEndAsync();
 
-                var emailProvider = JsonSerializer.Deserialize<email_provider>(emailProvidersConfigString);
+                var emailProvider = JsonSerializer.Deserialize<EmailProvider>(emailProvidersConfigString);
 
-                if (emailProviders.Any(x => x.name.Equals(emailProvider.name))) return;
+                if (emailProviders.Any(x => x.Name.Equals(emailProvider.Name))) return;
 
                 cb.Add(emailProvider);
             });

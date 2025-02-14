@@ -1,9 +1,9 @@
 {
-  "name": "insert_name_of_provider_here",
-  "is_active": false,
-  "configuration": "{\"ApiKey\":\"insert_api_key_here\",\"FromEmail\":\"insert_from_email_here\",\"FromName\":\"insert_from_name_here\"}",
-  "last_used_on": "2013-03-20T09:00:00.119Z",
-  "free_plan_qty": 0, // number of emails sent with free plan for this provider
-  "remaining_qty": 0, // remaining emails to be sent for this provider
-  "period": 1 // period in days that is needed to reset remaining_qty
+  "Name": "insert_name_of_provider_here",
+  "IsActive": false,
+  "Configuration": "{\"ApiKey\":\"insert_api_key_here\",\"FromEmail\":\"insert_from_email_here\",\"FromName\":\"insert_from_name_here\"}",
+  "LastUsedOn": "2013-03-20T09:00:00.119Z",
+  "FreePlanQty": 0,
+  "RemainingQty": 0,
+  "Period": 1
 }

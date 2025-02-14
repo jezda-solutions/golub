@@ -23,7 +23,7 @@ namespace Golub.Email
         public async Task DistributeEmailsByCapacityAsync(SendEmailRequest request)
         {
             var recipients = request.Tos.ToList();
-            var sentEmails = new List<sent_email>();
+            var sentEmails = new List<SentEmail>();
 
             foreach (var emailProvider in _emailProviders)
             {
@@ -42,7 +42,7 @@ namespace Golub.Email
                 }
 
                 var remainingCapacity
-                    = provider.remaining_qty;
+                    = provider.RemainingQty;
 
                 if (remainingCapacity == null || remainingCapacity == 0) continue;
 
@@ -65,14 +65,14 @@ namespace Golub.Email
 
                     foreach (var email in emailsToSend)
                     {
-                        sentEmails.Add(new sent_email
+                        sentEmails.Add(new SentEmail
                         {
-                            email_provider_id = provider.id,
-                            from = request.From,
-                            to = email,
-                            subject = request.Subject,
-                            is_successful = response.Success,
-                            remark = response.Message,
+                            EmailProviderId = provider.Id,
+                            From = request.From,
+                            To = email,
+                            Subject = request.Subject,
+                            IsSuccessful = response.Success,
+                            Remark = response.Message,
                         });
                     }
 
@@ -110,15 +110,15 @@ namespace Golub.Email
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private async Task<email_provider> GetEmailProviderWithCapacityAsync(string name)
+        private async Task<EmailProvider> GetEmailProviderWithCapacityAsync(string name)
         {
-            var provider = await _emailProviderRepository.GetFirstAsync(x => x.name == name && x.is_active);
+            var provider = await _emailProviderRepository.GetFirstAsync(x => x.Name == name && x.IsActive);
 
             if (provider == null) return null;
 
-            if (provider.last_used_on.Date != DateTime.Today)
+            if (provider.LastUsedOn.Date != DateTime.Today)
             {
-                provider.remaining_qty = provider.free_plan_qty;
+                provider.RemainingQty = provider.FreePlanQty;
             }
 
             return provider;
@@ -130,10 +130,10 @@ namespace Golub.Email
         /// <param name="emailProvider"></param>
         /// <param name="numberOfEmails"></param>
         /// <returns></returns>
-        public async Task UpdateEmailProviderCapacityAsync(email_provider emailProvider, int numberOfEmails)
+        public async Task UpdateEmailProviderCapacityAsync(EmailProvider emailProvider, int numberOfEmails)
         {
-            emailProvider.remaining_qty -= numberOfEmails;
-            emailProvider.last_used_on = DateTimeOffset.UtcNow;
+            emailProvider.RemainingQty -= numberOfEmails;
+            emailProvider.LastUsedOn = DateTimeOffset.UtcNow;
 
             await _emailProviderRepository.UpdateAsync(emailProvider);
         }

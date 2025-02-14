@@ -3,7 +3,7 @@
 namespace Golub.Interfaces.Repositories
 {
     /// <summary>
-    /// Represents a repository for <see cref="sent_email"/>
+    /// Represents a repository for <see cref="SentEmail"/>
     /// </summary>
-    public interface ISentEmailRepository : IGenericRepository<sent_email> { }
+    public interface ISentEmailRepository : IGenericRepository<SentEmail> { }
 }

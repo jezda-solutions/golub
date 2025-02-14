@@ -4,43 +4,43 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Golub.Configurations
 {
-    internal class EmailProviderConfiguration : IEntityTypeConfiguration<email_provider>
+    internal class EmailProviderConfiguration : IEntityTypeConfiguration<EmailProvider>
     {
-        public void Configure(EntityTypeBuilder<email_provider> builder)
+        public void Configure(EntityTypeBuilder<EmailProvider> builder)
         {
             builder.ToTable("email_provider");
 
-            builder.HasKey(e => e.id);
+            builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.name)
+            builder.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(255);
 
-            builder.HasIndex(x => x.name)
+            builder.HasIndex(x => x.Name)
                 .IsUnique(true);
 
-            builder.Property(e => e.is_active)
+            builder.Property(e => e.IsActive)
                 .IsRequired();
 
-            builder.Property(e => e.configuration)
+            builder.Property(e => e.Configuration)
                 .HasMaxLength(1000);
 
-            builder.Property(e => e.last_used_on)
+            builder.Property(e => e.LastUsedOn)
                 .IsRequired();
 
-            builder.Property(e => e.free_plan_qty)
+            builder.Property(e => e.FreePlanQty)
                 .IsRequired(false);
 
-            builder.Property(e => e.remaining_qty)
+            builder.Property(e => e.RemainingQty)
                 .IsRequired(false);
 
-            builder.Property(e => e.period)
+            builder.Property(e => e.Period)
                 .IsRequired(false);
 
-            builder.Property(e => e.created_on_utc)
+            builder.Property(e => e.CreatedOnUtc)
                 .IsRequired();
 
-            builder.Property(e => e.modified_on_utc)
+            builder.Property(e => e.ModifiedOnUtc)
                 .IsRequired(false);
         }
     }

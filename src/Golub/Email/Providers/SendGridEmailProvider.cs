@@ -28,9 +28,9 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.SendGrid;
 
-        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, email_provider provider)
+        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
         {
-            var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.configuration);
+            var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
 
             if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)
             {

@@ -4,27 +4,27 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Golub.Configurations
 {
-    internal class ApiKeyConfiguration : IEntityTypeConfiguration<api_key>
+    internal class ApiKeyConfiguration : IEntityTypeConfiguration<ApiKey>
     {
-        public void Configure(EntityTypeBuilder<api_key> builder)
+        public void Configure(EntityTypeBuilder<ApiKey> builder)
         {
             builder.ToTable("api_key");
 
-            builder.HasKey(e => e.id);
+            builder.HasKey(e => e.Id);
 
-            builder.Property(a => a.api_key_value)
+            builder.Property(a => a.ApiKeyValue)
                 .IsRequired();
 
-            builder.Property(a => a.expiration_date)
+            builder.Property(a => a.ExpirationDate)
                 .IsRequired(false);
 
-            builder.Property(a => a.application_name)
+            builder.Property(a => a.ApplicationName)
                 .IsRequired(false);
 
-            builder.Property(a => a.created_on_utc)
+            builder.Property(a => a.CreatedOnUtc)
                 .IsRequired();
 
-            builder.Property(a => a.modified_on_utc)
+            builder.Property(a => a.ModifiedOnUtc)
                 .IsRequired(false);
         }
     }
