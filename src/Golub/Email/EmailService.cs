@@ -23,6 +23,7 @@ namespace Golub.Email
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send emails. Error: {message}", ex.Message);
+                throw;
             }
         }
     }

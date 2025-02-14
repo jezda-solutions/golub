@@ -14,8 +14,18 @@ namespace Golub.Endpoints
             // Sending email endpoint
             endpoints.MapPost("/api/emails/send", async (IEmailService emailService, SendEmailRequest request) =>
             {
-                await emailService.SendEmailAsync(request);
-                return Results.Ok("Email sent successfully.");
+                try
+                {
+                    await emailService.SendEmailAsync(request);
+                    return Results.Ok("Email sent successfully.");
+                }
+                catch
+                {
+                    return Results.Problem(
+                        detail: "An error occurred while sending the email.",
+                        statusCode: StatusCodes.Status500InternalServerError
+                    );
+                }
             });
 
             return endpoints;

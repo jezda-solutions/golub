@@ -102,6 +102,7 @@ namespace Golub.Email
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to send batch with {ProviderName}.", emailProvider.GetType().Name);
+                    throw;
                 }
 
                 if (recipients.Count == 0) break;
