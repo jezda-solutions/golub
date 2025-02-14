@@ -28,20 +28,8 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.Mandrill;
 
-        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
+        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration)
         {
-            var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
-
-            if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)
-            {
-                _logger.LogWarning(
-                        "The 'FromEmail' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
-                        "There is a chance that the email might not be sent because the email might not be registered with the provider.",
-                        request.From,
-                        configuration.FromEmail
-                );
-            }
-
             var client = new MandrillApi(configuration.ApiKey);
 
             var tos = new List<EmailAddress>();
@@ -51,14 +39,11 @@ namespace Golub.Email.Providers
                 tos.Add(new EmailAddress(email));
             }
 
-            var fromEmail = request.From ?? configuration.FromEmail;
-            var fromName = request.FromName ?? configuration.FromName;
-
             var emailMessage = new EmailMessage()
             {
                 To = tos,
-                FromEmail = fromEmail,
-                FromName = fromName,
+                FromEmail = request.From,
+                FromName = request.FromName,
                 Subject = request.Subject,
                 Text = request.PlainTextContent
             };

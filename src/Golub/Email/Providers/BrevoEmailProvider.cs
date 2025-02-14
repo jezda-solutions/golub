@@ -28,27 +28,13 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.Brevo;
 
-        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider)
+        public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration)
         {
-            var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
             Configuration.Default.AddApiKey("api-key", configuration.ApiKey);
-
-            if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)
-            {
-                _logger.LogWarning(
-                    "The 'FromEmail' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
-                    "There is a chance that the email might not be sent because the email might not be registered with the provider.",
-                    request.From,
-                    configuration.FromEmail
-                );
-            }
 
             var apiInstance = new TransactionalEmailsApi();
 
-            var fromEmail = request.From ?? configuration.FromEmail;
-            var fromName = request.FromName ?? configuration.FromName;
-
-            var sender = new SendSmtpEmailSender(fromName, fromEmail);
+            var sender = new SendSmtpEmailSender(request.FromName, request.From);
 
             var tos = request.Tos
                .Select(x => new SendSmtpEmailTo(x, x))

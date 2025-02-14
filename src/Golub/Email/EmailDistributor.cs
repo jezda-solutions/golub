@@ -1,8 +1,10 @@
 ﻿using Golub.Entities;
+using Golub.Entities.ProviderConfiguration;
 using Golub.Enums;
 using Golub.Interfaces.Repositories;
 using Golub.Requests;
 using Golub.Services.Interfaces;
+using System.Text.Json;
 
 namespace Golub.Email
 {
@@ -41,6 +43,18 @@ namespace Golub.Email
                     continue;
                 }
 
+                var configuration = JsonSerializer.Deserialize<BaseEmailProviderConfiguration>(provider.Configuration);
+
+                if (!string.IsNullOrEmpty(request.From) && request.From != configuration.FromEmail)
+                {
+                    _logger.LogWarning(
+                            "The 'FromEmail' in the request ({RequestFromEmail}) does not match the configured 'FromEmail' ({ConfiguredFromEmail}). " +
+                            "There is a chance that the email might not be sent because the email might not be registered with the provider.",
+                            request.From,
+                            configuration.FromEmail
+                    );
+                }
+
                 var remainingCapacity
                     = provider.RemainingQty;
 
@@ -58,17 +72,17 @@ namespace Golub.Email
                         Tos = emailsToSend,
                         Ccs = request.Ccs,
                         InnerHtml = request.InnerHtml,
-                        From = request.From,
-                        FromName = request.FromName,
+                        From = request.From ?? configuration.FromEmail,
+                        FromName = request.FromName ?? configuration.FromName,
                         PlainTextContent = request.PlainTextContent
-                    }, provider);
+                    }, provider, configuration);
 
                     foreach (var email in emailsToSend)
                     {
                         sentEmails.Add(new SentEmail
                         {
                             EmailProviderId = provider.Id,
-                            From = request.From,
+                            From = request.From ?? configuration.FromEmail,
                             To = email,
                             Subject = request.Subject,
                             IsSuccessful = response.Success,

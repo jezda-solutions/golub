@@ -1,4 +1,5 @@
 ﻿using Golub.Entities;
+using Golub.Entities.ProviderConfiguration;
 using Golub.Requests;
 using Golub.Responses;
 
@@ -16,6 +17,6 @@ namespace Golub.Services.Interfaces
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider);
+        Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration);
     }
 }
