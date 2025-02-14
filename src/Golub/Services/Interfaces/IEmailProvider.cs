@@ -8,7 +8,7 @@ namespace Golub.Services.Interfaces
     public interface IEmailProvider
     {
         /// <summary>
-        /// Email provider name
+        /// Email provider name for example: SendGrid, Mandrill, etc.
         /// </summary>
         string ProviderName { get; }
 

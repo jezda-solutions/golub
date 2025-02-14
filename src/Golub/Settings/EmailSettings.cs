@@ -9,6 +9,11 @@
     /// </summary>
     public class EmailSettings
     {
+        /// <summary>
+        /// Blind Carbon Copy (BCC) email address.
+        /// Used to track email delivery success
+        /// by ensuring a copy is sent to a designated address.
+        /// </summary>
         public string Bcc { get; set; }
     }
 }

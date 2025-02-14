@@ -31,7 +31,7 @@ namespace Golub.Email
             {
                 if (!Enum.TryParse(emailProvider.ProviderName, out EmailProviderType emailProviderType))
                 {
-                    _logger.LogError("Email provider '{ProviderName}' not found.", emailProvider.ProviderName);
+                    _logger.LogWarning("Email provider '{ProviderName}' not found.", emailProvider.ProviderName);
                     continue;
                 }
 
@@ -39,7 +39,7 @@ namespace Golub.Email
 
                 if (provider == null)
                 {
-                    _logger.LogError("Email provider '{ProviderName}' not found.", emailProvider.ProviderName);
+                    _logger.LogWarning("Email provider '{ProviderName}' not found.", emailProvider.ProviderName);
                     continue;
                 }
 
@@ -114,7 +114,7 @@ namespace Golub.Email
 
             if (recipients.Count > 0)
             {
-                _logger.LogError("Not enough capacity to send all emails. Remaining: {Count}",
+                _logger.LogWarning("Not enough capacity to send all emails. Remaining: {Count}",
                                  request.Tos.Count());
             }
         }

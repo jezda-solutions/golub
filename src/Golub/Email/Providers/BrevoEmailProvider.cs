@@ -66,9 +66,9 @@ namespace Golub.Email.Providers
 
             try
             {
-                CreateSmtpEmail result = await apiInstance.SendTransacEmailAsync(sendSmtpEmail);
+                var response = await apiInstance.SendTransacEmailAsync(sendSmtpEmail);
 
-                if (result.MessageId != null)
+                if (response.MessageId != null)
                 {
                     return new BrevoResponse(true, "Email sent successfully.");
                 }
