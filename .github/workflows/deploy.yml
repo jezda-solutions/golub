@@ -1,6 +1,11 @@
 name: Deploy on PROD environment
 
 on:
+  push:
+    branches:
+      - dev
+      - main
+      - folder-updates-and-init-deploy
   pull_request:
     types: [closed]
     branches:
