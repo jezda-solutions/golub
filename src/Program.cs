@@ -15,7 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args)
+    ?? throw new InvalidOperationException("Failed to create WebApplicationBuilder");
+
+ArgumentNullException.ThrowIfNull(builder.Configuration, "Configuration manager is null");
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
