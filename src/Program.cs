@@ -115,4 +115,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.MapHealthChecks("/health");
+
 app.Run();
