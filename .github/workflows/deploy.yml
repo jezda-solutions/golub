@@ -13,6 +13,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  SERVICE_NAME: api.golub.service
+  DEPLOYMENT_PATH: /var/www/api/golub/
+
 jobs:
   deploy:
     ### revert when ready
@@ -48,12 +52,12 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} >> ~/.ssh/known_hosts
       
       - name: Stop service on server
-        run: ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo systemctl stop golub.service"
+        run: ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo systemctl stop ${{ env.SERVICE_NAME }}"
 
       - name: Clean files on destination (excluding folders and appsettings.json)
         run: |
           ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} \
-            "find /var/www/api/golub/ -type f ! -name 'appsettings.json' -exec rm -f {} +"
+            "find ${{ env.DEPLOYMENT_PATH }} -type f ! -name 'appsettings.json' -exec rm -f {} +"
 
       - name: Copy files via rsync
         run: |
@@ -61,15 +65,15 @@ jobs:
 
       - name: Change ownership to www-data
         run: |
-          ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo chown -R www-data:www-data /var/www/api/golub/"
+          ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo chown -R www-data:www-data ${{ env.DEPLOYMENT_PATH }}"
 
       - name: Set permissions for directories to 755
         run: |
-            ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find /var/www/api/golub/ -type d -exec chmod 755 {} \;"
+            ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find ${{ env.DEPLOYMENT_PATH }} -type d -exec chmod 755 {} \;"
             
       - name: Set permissions for files to 644
         run: |
-            ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find /var/www/api/golub/ -type f -exec chmod 644 {} \;"
+            ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find ${{ env.DEPLOYMENT_PATH }} -type f -exec chmod 644 {} \;"
        
       - name: Start service on server
-        run: ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo systemctl start golub.service"
+        run: ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo systemctl start ${{ env.SERVICE_NAME }}"
