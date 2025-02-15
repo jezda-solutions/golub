@@ -53,8 +53,7 @@ jobs:
       
       - name: Stop service on server
         run: |
-          ssh -o StrictHostKeyChecking=no \
-          ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} \
+          ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} \
           "sudo systemctl stop ${{ env.SERVICE_NAME }}"
   
       - name: Clean files on destination (excluding folders and appsettings.json)
