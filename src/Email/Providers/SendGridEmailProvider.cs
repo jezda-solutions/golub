@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Net;
-using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
@@ -19,12 +18,9 @@ namespace Golub.Email.Providers
     /// Sends emails using the SendGrid API
     /// </summary>
     /// <param name="emailSettings"></param>
-    /// <param name="logger"></param>
-    public class SendGridEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<SendGridEmailProvider> logger) : IEmailProvider
+    public class SendGridEmailProvider(IOptions<EmailSettings> emailSettings) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly ILogger<SendGridEmailProvider> _logger
-            = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public string ProviderName => EmailProviderConstants.SendGrid;
 

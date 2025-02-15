@@ -10,7 +10,6 @@ using Mandrill;
 using Mandrill.Models;
 using Mandrill.Requests.Messages;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
@@ -19,12 +18,9 @@ namespace Golub.Email.Providers
     /// Sends emails using Mandrill API
     /// </summary>
     /// <param name="emailSettings"></param>
-    /// <param name="logger"></param>
-    public class MandrillEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<MandrillEmailProvider> logger) : IEmailProvider
+    public class MandrillEmailProvider(IOptions<EmailSettings> emailSettings) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly ILogger<MandrillEmailProvider> _logger
-            = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public string ProviderName => EmailProviderConstants.Mandrill;
 

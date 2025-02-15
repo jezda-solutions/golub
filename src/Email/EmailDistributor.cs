@@ -74,7 +74,8 @@ namespace Golub.Email
                         InnerHtml = request.InnerHtml,
                         From = request.From ?? configuration.FromEmail,
                         FromName = request.FromName ?? configuration.FromName,
-                        PlainTextContent = request.PlainTextContent
+                        PlainTextContent = request.PlainTextContent,
+                        Bcc = request.Bcc
                     }, provider, configuration);
 
                     foreach (var email in emailsToSend)
