@@ -15,10 +15,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args)
-    ?? throw new InvalidOperationException("Failed to create WebApplicationBuilder");
+var builder = WebApplication.CreateBuilder(args);
 
-ArgumentNullException.ThrowIfNull(builder.Configuration, "Configuration manager is null");
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -87,6 +88,8 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
