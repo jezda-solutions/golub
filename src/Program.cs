@@ -17,6 +17,10 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -85,6 +89,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 app.Services.ApplyMigrations();
@@ -115,5 +121,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.Run();
+app.MapHealthChecks("/health");
 
+app.Run();
