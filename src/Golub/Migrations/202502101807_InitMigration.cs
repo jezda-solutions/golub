@@ -40,7 +40,8 @@ namespace Golub.Migrations
                 .WithColumn("remaining_qty").AsInt32().Nullable()
                 .WithColumn("period").AsInt32().Nullable()
                 .WithColumn("created_on_utc").AsDateTimeOffset().NotNullable()
-                .WithColumn("modified_on_utc").AsDateTimeOffset().Nullable();
+                .WithColumn("modified_on_utc").AsDateTimeOffset().Nullable()
+                .WithColumn("deleted_on_utc").AsDateTimeOffset().Nullable();
 
             Create.Table("sent_email")
                 .WithColumn("id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())

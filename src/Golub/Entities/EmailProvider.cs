@@ -56,5 +56,11 @@
         /// Date and time when the email provider was last modified
         /// </summary>
         public DateTimeOffset? ModifiedOnUtc { get; set; }
+
+
+        /// <summary>
+        /// Date and time when the email provider was deleted
+        /// </summary>
+        public DateTimeOffset? DeletedOnUtc { get; set; }
     }
 }

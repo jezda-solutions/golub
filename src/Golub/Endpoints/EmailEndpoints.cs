@@ -1,4 +1,5 @@
-﻿using Golub.Requests;
+﻿using Golub.Endpoints.Interfaces;
+using Golub.Requests;
 using Golub.Services.Interfaces;
 
 namespace Golub.Endpoints
@@ -7,12 +8,12 @@ namespace Golub.Endpoints
     /// Email endpoints
     /// Class contains all email endpoints
     /// </summary>
-    public static class EmailEndpoints
+    public class EmailEndpoints : IEndpoints
     {
-        public static IEndpointRouteBuilder MapEmailEndpoints(this IEndpointRouteBuilder endpoints)
+        public void RegisterEndpoints(IEndpointRouteBuilder app)
         {
             // Sending email endpoint
-            endpoints.MapPost("/api/emails/send", async (IEmailService emailService, SendEmailRequest request) =>
+            app.MapPost("/api/emails/send", async (IEmailService emailService, SendEmailRequest request) =>
             {
                 try
                 {
@@ -27,8 +28,6 @@ namespace Golub.Endpoints
                     );
                 }
             });
-
-            return endpoints;
         }
     }
 }
