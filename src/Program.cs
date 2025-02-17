@@ -2,7 +2,8 @@
 using Golub.Data;
 using Golub.Email;
 using Golub.Email.Providers;
-using Golub.Endpoints;
+using Golub.Endpoints.Interfaces;
+using Golub.Handlers.EmailProvider;
 using Golub.Interfaces;
 using Golub.Interfaces.Repositories;
 using Golub.Middlewares;
@@ -14,6 +15,7 @@ using Golub.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +52,15 @@ builder.Services.AddScoped<IEmailProvider, SendGridEmailProvider>();
 builder.Services.AddScoped<IEmailProvider, BrevoEmailProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailDistributor, EmailDistributor>();
+
+// Handlers registration
+builder.Services.AddScoped<GetAllEmailProvidersHandler>();
+builder.Services.AddScoped<GetEmailProviderByNameHandler>();
+builder.Services.AddScoped<GetEmailProviderByIdHandler>();
+builder.Services.AddScoped<AddEmailProviderHandler>();
+builder.Services.AddScoped<UpdateEmailProviderHandler>();
+builder.Services.AddScoped<UpdateEmailProviderIsActiveHandler>();
+builder.Services.AddScoped<SoftDeleteEmailProviderHandler>();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -103,10 +114,19 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Register endpoints
-app.MapEmailEndpoints();
+var endpointDefinitions = Assembly.GetExecutingAssembly()
+    .GetTypes()
+    .Where(t => t.IsClass && typeof(IEndpoints).IsAssignableFrom(t))
+    .Select(Activator.CreateInstance)
+    .Cast<IEndpoints>();
 
-// Middleware checks the API Key only when the request starts with /api/emails
-app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/emails"), appBuilder =>
+foreach (var endpoint in endpointDefinitions)
+{
+    endpoint.RegisterEndpoints(app);
+}
+
+// Middleware checks the API Key only when the request starts with /api
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
 {
     appBuilder.UseMiddleware<ApiKeyMiddleware>();
 });
