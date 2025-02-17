@@ -10,7 +10,6 @@ using Golub.Responses.ProviderResponse;
 using Golub.Services.Interfaces;
 using Golub.Settings;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 
 namespace Golub.Email.Providers
 {
@@ -19,12 +18,9 @@ namespace Golub.Email.Providers
     /// Sends emails using Brevo API
     /// </summary>
     /// <param name="emailSettings"></param>
-    /// <param name="logger"></param>
-    public class BrevoEmailProvider(IOptions<EmailSettings> emailSettings, ILogger<BrevoEmailProvider> logger) : IEmailProvider
+    public class BrevoEmailProvider(IOptions<EmailSettings> emailSettings) : IEmailProvider
     {
         private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly ILogger<BrevoEmailProvider> _logger
-            = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public string ProviderName => EmailProviderConstants.Brevo;
 
