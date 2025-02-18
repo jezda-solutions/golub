@@ -49,6 +49,8 @@ namespace Golub.Endpoints.Validators
         /// <returns></returns>
         private bool IsValidEmail(string email)
         {
+            // we are here returning true because we have default email in configuration
+            // that gets applied if email is not provided
             if (string.IsNullOrEmpty(email)) return true;
 
             try
