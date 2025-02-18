@@ -1,8 +1,10 @@
-﻿using Golub.Contexts;
+﻿using FluentValidation;
+using Golub.Contexts;
 using Golub.Data;
 using Golub.Email;
 using Golub.Email.Providers;
 using Golub.Endpoints.Interfaces;
+using Golub.Endpoints.Validators;
 using Golub.Handlers.EmailProvider;
 using Golub.Interfaces;
 using Golub.Interfaces.Repositories;
@@ -61,6 +63,9 @@ builder.Services.AddScoped<AddEmailProviderHandler>();
 builder.Services.AddScoped<UpdateEmailProviderHandler>();
 builder.Services.AddScoped<UpdateEmailProviderIsActiveHandler>();
 builder.Services.AddScoped<SoftDeleteEmailProviderHandler>();
+
+// Validators registration
+builder.Services.AddValidatorsFromAssemblyContaining<SendEmailRequestValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
 
