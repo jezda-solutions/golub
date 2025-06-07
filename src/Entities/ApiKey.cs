@@ -13,11 +13,6 @@ namespace Golub.Entities
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The unique value of the API key
-        /// </summary>
-        public Guid ApiKeyValue { get; set; }
-
-        /// <summary>
         /// Expiration date of the API key that can be nullable
         /// </summary>
         public DateTimeOffset? ExpirationDate { get; set; }
