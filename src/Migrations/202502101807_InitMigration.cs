@@ -24,9 +24,9 @@ namespace Golub.Migrations
         {
             Create.Table("api_key")
                 .WithColumn("id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
-                .WithColumn("expiration_date").AsDateTimeOffset().Nullable()
                 .WithColumn("application_name").AsString().Nullable()
                 .WithColumn("created_on_utc").AsDateTimeOffset().NotNullable()
+                .WithColumn("expiration_date").AsDateTimeOffset().Nullable()
                 .WithColumn("modified_on_utc").AsDateTimeOffset().Nullable();
 
             Create.Table("email_provider")
