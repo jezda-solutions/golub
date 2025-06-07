@@ -5,7 +5,6 @@ on:
     branches:
       - dev
       - main
-      - folder-updates-and-init-deploy
   pull_request:
     types: [closed]
     branches:
@@ -15,12 +14,11 @@ on:
 
 env:
   SERVICE_NAME: api.golub.service
-  DEPLOYMENT_PATH: /var/www/api/golub/
+  DEPLOY_PATH: /var/www/api/golub/
 
 jobs:
   deploy:
-    ## revert when ready
-    ## if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -31,11 +29,8 @@ jobs:
         with:
           dotnet-version: 9.x
 
-      - name: Restore dependencies
-        run: dotnet restore src/Golub.sln
-
-      - name: Build
-        run: dotnet build --no-restore --configuration Release src/Golub.sln
+      - name: Build with restore
+        run: dotnet build --configuration Release src/Golub.sln
 
       - name: Publish
         run: dotnet publish --configuration Release --framework net9.0 --runtime linux-x64 --self-contained false -o publish_output src/Golub.sln
@@ -56,26 +51,24 @@ jobs:
           ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} \
           "sudo systemctl stop ${{ env.SERVICE_NAME }}"
   
-      - name: Clean files on destination (excluding folders and appsettings.json)
+      - name: Clean files on destination (excluding folders and specific files/folders)
         run: |
+          EXCLUDED_ITEMS=('appsettings.json' 'SeedFiles') # Niz fajlova i foldera za preskakanje
+          EXCLUDED_ARGS=$(printf " ! -name '%s' ! -path '*/%s/*'" "${EXCLUDED_ITEMS[@]}" | sed 's/  */ /g') # Kreira string za find
           ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} \
-            "find ${{ env.DEPLOYMENT_PATH }} -type f ! -name 'appsettings.json' -exec rm -f {} +"
-
+            "find ${{ env.DEPLOY_PATH }} -type f $EXCLUDED_ARGS -exec rm -f {} +"
+      
       - name: Copy files via rsync
         run: |
-          rsync -avz --exclude 'appsettings.json' ./publish_output/ ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }}:${{ secrets.CONTABO_SERVER_SSH_QA_DESTINATION_PATH }}
-
-      - name: Change ownership to www-data
-        run: |
-          ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo chown -R www-data:www-data ${{ env.DEPLOYMENT_PATH }}"
+          rsync -avz --exclude 'appsettings.json' --exclude 'SeedFiles' ./publish_output/ ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }}:${{ env.DEPLOY_PATH }}
 
       - name: Set permissions for directories to 755
         run: |
-            ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find ${{ env.DEPLOYMENT_PATH }} -type d -exec chmod 755 {} \;"
-            
+          ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find ${{ env.DEPLOY_PATH }} -type d -exec chmod 755 {} \;"
+
       - name: Set permissions for files to 644
         run: |
-            ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find ${{ env.DEPLOYMENT_PATH }} -type f -exec chmod 644 {} \;"
-       
-      - name: Start service on server
+          ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find ${{ env.DEPLOY_PATH }} -type f -exec chmod 644 {} \;"
+
+      - name: Start the service
         run: ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo systemctl start ${{ env.SERVICE_NAME }}"
