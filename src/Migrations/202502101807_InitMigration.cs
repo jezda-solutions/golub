@@ -24,7 +24,6 @@ namespace Golub.Migrations
         {
             Create.Table("api_key")
                 .WithColumn("id").AsGuid().PrimaryKey().WithDefaultValue(Guid.CreateVersion7())
-                .WithColumn("api_key_value").AsGuid().NotNullable().Unique().WithDefaultValue(Guid.CreateVersion7())
                 .WithColumn("expiration_date").AsDateTimeOffset().Nullable()
                 .WithColumn("application_name").AsString().Nullable()
                 .WithColumn("created_on_utc").AsDateTimeOffset().NotNullable()
