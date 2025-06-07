@@ -14,7 +14,7 @@ on:
 
 env:
   SERVICE_NAME: api.golub.service
-  DEPLOYMENT_PATH: /var/www/api/golub/
+  DEPLOY_PATH: /var/www/api/golub/
 
 jobs:
   deploy:
@@ -70,5 +70,5 @@ jobs:
         run: |
           ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo find ${{ env.DEPLOY_PATH }} -type f -exec chmod 644 {} \;"
 
-      - name: Start hrms.qa.service
+      - name: Start the service
         run: ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} "sudo systemctl start ${{ env.SERVICE_NAME }}"
