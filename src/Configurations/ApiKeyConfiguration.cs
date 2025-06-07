@@ -12,9 +12,6 @@ namespace Golub.Configurations
 
             builder.HasKey(e => e.Id);
 
-            builder.Property(a => a.ApiKeyValue)
-                .IsRequired();
-
             builder.Property(a => a.ExpirationDate)
                 .IsRequired(false);
 
