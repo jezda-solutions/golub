@@ -53,14 +53,14 @@ jobs:
   
       - name: Clean files on destination (excluding folders and specific files/folders)
         run: |
-          EXCLUDED_ITEMS=('appsettings.json') # Niz fajlova i foldera za preskakanje
+          EXCLUDED_ITEMS=('appsettings.json' 'SeedFiles') # Niz fajlova i foldera za preskakanje
           EXCLUDED_ARGS=$(printf " ! -name '%s' ! -path '*/%s/*'" "${EXCLUDED_ITEMS[@]}" | sed 's/  */ /g') # Kreira string za find
           ssh ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }} \
             "find ${{ env.DEPLOY_PATH }} -type f $EXCLUDED_ARGS -exec rm -f {} +"
       
       - name: Copy files via rsync
         run: |
-          rsync -avz --exclude 'appsettings.json' ./publish_output/ ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }}:${{ env.DEPLOY_PATH }}
+          rsync -avz --exclude 'appsettings.json' --exclude 'SeedFiles' ./publish_output/ ${{ secrets.CONTABO_SERVER_SSH_USER }}@${{ secrets.CONTABO_SERVER_SSH_SERVER_IP }}:${{ env.DEPLOY_PATH }}
 
       - name: Set permissions for directories to 755
         run: |
