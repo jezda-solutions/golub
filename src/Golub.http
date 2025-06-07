@@ -1,0 +1,17 @@
+@Golub_HostAddress = http://localhost:5257
+
+### POST reequest to send email api/emails/send
+POST {{Golub_HostAddress}}/api/emails/send
+Content-Type: application/json
+
+{
+  "tos": ["recipient1@example.com", "recipient2@example.com"],
+  "ccs": ["cc@example.com"],
+  "bcc": ["bcc@example.com"],
+  "subject": "Test Email",
+  "plainTextContent": "This is a test email from the API.",
+  "from": "sender@example.com",
+  "fromName": "Sender Name",
+  "innerHtml": "<p>This is a <strong>test email</strong> from the API.</p>"
+}
+###
