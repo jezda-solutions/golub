@@ -45,11 +45,12 @@ namespace Golub.Email.Providers
                 request.InnerHtml,
                 substitutions);
 
-            if (request.Bcc != null && request.Bcc.Any())
+            if (request.Bcc != null && request.Bcc.Any(x => !string.IsNullOrEmpty(x)))
             {
                 var bccs = request.Bcc
-                .Select(x => new EmailAddress(x))
-                .ToList();
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Select(x => new EmailAddress(x))
+                    .ToList();
 
                 sendGridMessage.AddBccs(bccs);
             }

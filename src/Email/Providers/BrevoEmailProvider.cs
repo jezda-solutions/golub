@@ -53,9 +53,11 @@ namespace Golub.Email.Providers
                 ];
             }
 
-            if (request.Bcc != null && request.Bcc.Any())
+            if (request.Bcc != null && request.Bcc.Any(x => !string.IsNullOrEmpty(x)))
             {
-                var bccs = request.Bcc.Select(x => new SendSmtpEmailBcc(x, x));
+                var bccs = request.Bcc
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Select(x => new SendSmtpEmailBcc(x, x));
 
                 sendSmtpEmail.Bcc.AddRange(bccs);
             }

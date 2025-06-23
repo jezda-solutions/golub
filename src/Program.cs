@@ -48,7 +48,6 @@ builder.Services.AddScoped<ISentEmailRepository, SentEmailRepository>();
 builder.Services.AddScoped<IEmailSeedService, EmailSeedService>();
 builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 builder.Services.AddScoped<ApiKeyValidationService>();
-builder.Services.AddScoped<ApiKeyService>();
 builder.Services.AddScoped<IEmailProvider, MandrillEmailProvider>();
 builder.Services.AddScoped<IEmailProvider, SendGridEmailProvider>();
 builder.Services.AddScoped<IEmailProvider, BrevoEmailProvider>();
@@ -69,7 +68,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<SendEmailRequestValidator>(
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection("Security"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddSwaggerGen(options =>
@@ -89,6 +87,14 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Enter API Key for authentication"
     });
 
+    options.AddSecurityDefinition("ApplicationName", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "X-Client-Name",
+        Type = SecuritySchemeType.ApiKey,
+        Description = "Application client identifier."
+    });
+
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -100,7 +106,18 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "ApiKey"
                 }
             },
-            Array.Empty<string>()
+            []
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "ApplicationName"
+                }
+            },
+            []
         }
     });
 });

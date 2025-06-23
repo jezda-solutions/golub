@@ -17,12 +17,14 @@ namespace Golub.Services.ApiKeyServices
         /// </summary>
         /// <param name="apiKey"></param>
         /// <returns></returns>
-        public async Task<bool> IsValidApiKeyAsync(string apiKey)
+        public async Task<bool> IsValidApiKeyAsync(string apiKey, string applicationName)
         {
             if (!Guid.TryParse(apiKey, out var apiKeyGuid)) return false;
 
-            return await _apiKeyRepository.AnyAsync(a => 
-                a.Id == apiKeyGuid && (a.ExpirationDate == null || a.ExpirationDate > DateTimeOffset.UtcNow)
+            return await _apiKeyRepository.AnyAsync(
+                a => a.Id == apiKeyGuid 
+                  && a.ApplicationName == applicationName
+                  && (a.ExpirationDate == null || a.ExpirationDate > DateTimeOffset.UtcNow)
             );
         }
     }
