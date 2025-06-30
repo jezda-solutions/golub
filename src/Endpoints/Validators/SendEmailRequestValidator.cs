@@ -27,15 +27,9 @@ namespace Golub.Endpoints.Validators
                 .NotEmpty()
                 .WithMessage("Subject cannot be empty.");
 
-            RuleFor(x => x.PlainTextContent)
-                .NotEmpty()
-                .WithMessage("Plain text content cannot be empty.")
-                .When(x => string.IsNullOrEmpty(x.InnerHtml));
-
             RuleFor(x => x.InnerHtml)
                 .NotEmpty()
-                .WithMessage("HTML content cannot be empty.")
-                .When(x => string.IsNullOrEmpty(x.PlainTextContent));
+                .WithMessage("HTML content cannot be empty.");
 
             RuleFor(x => x.From)
                 .Must(IsValidEmail)

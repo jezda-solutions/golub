@@ -21,6 +21,6 @@
 
         public string FromName { get; set; }
 
-        public string InnerHtml { get; set; }
+        public required string InnerHtml { get; set; }
     }
 }

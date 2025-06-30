@@ -27,7 +27,7 @@ namespace Golub.Email
             var recipients = request.Tos.ToList();
             var sentEmails = new List<SentEmail>();
 
-            foreach (var emailProvider in _emailProviders)
+            foreach (var emailProvider in _emailProviders.OrderBy(x => x.ProviderName))
             {
                 if (!Enum.TryParse(emailProvider.ProviderName, out EmailProviderType emailProviderType))
                 {
@@ -72,7 +72,9 @@ namespace Golub.Email
                         Tos = emailsToSend,
                         Ccs = request.Ccs,
                         InnerHtml = request.InnerHtml,
-                        From = request.From ?? configuration.FromEmail,
+                        From = !string.IsNullOrEmpty(request.From) 
+                             ? request.From 
+                             : configuration.FromEmail,
                         FromName = request.FromName ?? configuration.FromName,
                         PlainTextContent = request.PlainTextContent,
                         Bcc = request.Bcc
