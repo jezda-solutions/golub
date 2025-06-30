@@ -27,7 +27,9 @@ namespace Golub.Email
             var recipients = request.Tos.ToList();
             var sentEmails = new List<SentEmail>();
 
-            foreach (var emailProvider in _emailProviders.OrderBy(x => x.ProviderName))
+            var emailProviders = _emailProviders.OrderBy(x => x.Priority);
+
+            foreach (var emailProvider in emailProviders)
             {
                 if (!Enum.TryParse(emailProvider.ProviderName, out EmailProviderType emailProviderType))
                 {

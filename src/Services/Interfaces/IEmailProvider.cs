@@ -13,6 +13,11 @@ namespace Golub.Services.Interfaces
         string ProviderName { get; }
 
         /// <summary>
+        /// Gets the priority level of the item.
+        /// </summary>
+        int Priority { get; }
+
+        /// <summary>
         /// Method for sending emails
         /// </summary>
         /// <param name="request"></param>

@@ -24,6 +24,8 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.Brevo;
 
+        public int Priority => 1;
+
         public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration)
         {
             Configuration.Default.AddApiKey("api-key", configuration.ApiKey);

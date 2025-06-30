@@ -24,6 +24,8 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.SendGrid;
 
+        public int Priority => 2;
+
         public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration)
         {
             var client = new SendGridClient(configuration.ApiKey);

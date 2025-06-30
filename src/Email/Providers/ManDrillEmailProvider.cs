@@ -24,6 +24,8 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.Mandrill;
 
+        public int Priority => 3;
+
         public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration)
         {
             var client = new MandrillApi(configuration.ApiKey);
