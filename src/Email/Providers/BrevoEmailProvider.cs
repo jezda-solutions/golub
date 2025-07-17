@@ -24,6 +24,8 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.Brevo;
 
+        public int Priority => 1;
+
         public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration)
         {
             Configuration.Default.AddApiKey("api-key", configuration.ApiKey);
@@ -53,9 +55,11 @@ namespace Golub.Email.Providers
                 ];
             }
 
-            if (request.Bcc != null && request.Bcc.Any())
+            if (request.Bcc != null && request.Bcc.Any(x => !string.IsNullOrEmpty(x)))
             {
-                var bccs = request.Bcc.Select(x => new SendSmtpEmailBcc(x, x));
+                var bccs = request.Bcc
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Select(x => new SendSmtpEmailBcc(x, x));
 
                 sendSmtpEmail.Bcc.AddRange(bccs);
             }

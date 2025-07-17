@@ -24,6 +24,8 @@ namespace Golub.Email.Providers
 
         public string ProviderName => EmailProviderConstants.SendGrid;
 
+        public int Priority => 2;
+
         public async Task<IEmailResponse> SendEmailAsync(SendEmailRequest request, EmailProvider provider, BaseEmailProviderConfiguration configuration)
         {
             var client = new SendGridClient(configuration.ApiKey);
@@ -45,11 +47,12 @@ namespace Golub.Email.Providers
                 request.InnerHtml,
                 substitutions);
 
-            if (request.Bcc != null && request.Bcc.Any())
+            if (request.Bcc != null && request.Bcc.Any(x => !string.IsNullOrEmpty(x)))
             {
                 var bccs = request.Bcc
-                .Select(x => new EmailAddress(x))
-                .ToList();
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Select(x => new EmailAddress(x))
+                    .ToList();
 
                 sendGridMessage.AddBccs(bccs);
             }
